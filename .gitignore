@@ -55,3 +55,6 @@ docs/_build/
 
 # PyBuilder
 target/
+.idea/
+deploy.sh
+configure.sh
