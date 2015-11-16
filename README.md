@@ -2,7 +2,7 @@
 Distance Networks, an memory network like learning scheme
 Results Comparison Thus far
 | Task Number/Name             |   LSTM Baseline |   PE LS RN JOINT (3-HOP, FB) |   PE LS JOINT (1-HOP, FB) |   Distance Networks (2-HOP) |                                                                                                                                       
-|------------------------------|----------------:|------------------------------|---------------------------|-----------------------------|                                                                                                                                       
+|------------------------------|-----------------|------------------------------|---------------------------|-----------------------------|                                                                                                                                       
 | QA1 - Single Supporting Fact |           0.5   |                      1       |                     0.992 |                       1     |                                                                                                                                       
 | QA2 - Two Supporting Facts   |           0.2   |                      0.886   |                     0.38  |                       0.847 |                                                                                                                                       
 | QA3 - Three Supporting Facts |           0.2   |                      0.781   |                     0.231 |                       0.625 |                                                                                                                                       
