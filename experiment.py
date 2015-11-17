@@ -15,6 +15,7 @@ import os.path
 
 BATCH_SIZE = 1000
 EPOCHS = 5000
+HOPS = 3
 ONLY_SUPPORTING = False
 
 np.set_printoptions(precision=4)
@@ -39,7 +40,8 @@ else:
 
 nn = Logic()
 
-rfilename = "TwoHopWithAttention"
+
+rfilename = "Attention_" + str(HOPS) + "_"
 rheader = ""
 
 if(opts.ONLY_SUPPORTING):
@@ -182,7 +184,7 @@ if(opts.memory):
 
     #
     print("Compiling...")
-    attention = nn.distancenet(vocab_size, vocab_size, dropout = True, d_perc = 0.3, hop_depth = 2, type = "CCE", maxsize = max_sentence_length)
+    attention = nn.distancenet(vocab_size, vocab_size, dropout = True, d_perc = 0.3, hop_depth = HOPS, type = "CCE", maxsize = max_sentence_length)
     #attention = nn.sequencialattention(vocab_size, vocab_size, dropout = True, d_perc = 0.2, hop_depth = 2, type = "CCE", maxsize = max_sentence_length)
     #attention = nn.softmaxattention(vocab_size, vocab_size, dropout = True, d_perc = 0.2, hop_depth = 1, type = "CCE", maxsize = max_sentence_length)
 
