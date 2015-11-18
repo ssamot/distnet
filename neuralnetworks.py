@@ -16,7 +16,7 @@ from keras.layers.convolutional import Convolution1D, MaxPooling1D
 
 from utils import bcolors
 
-size = 2**6+20
+size = 2**6+30
 attention = size
 
 
@@ -65,7 +65,7 @@ class Logic():
 
         sentrnn.add(Embedding(vocab_size, self.embed_hidden_size, mask_zero=False,W_constraint=mx(), W_regularizer=reg()))
         sentrnn.add(MaxPooling1D(pool_length=maxsize))
-        sentrnn.add(Dropout(0.1))
+        #sentrnn.add(Dropout(0.1))
 
         qrnn = Sequential()
         qrnn.add(Embedding(vocab_size, self.embed_hidden_size, mask_zero=True,W_constraint=mx(), W_regularizer=reg()))
@@ -79,7 +79,9 @@ class Logic():
             hop = Sequential()
             l_size = self.sent_hidden_size
             hop.add(AttentionMerge(init_qa + past, l_size, input_shape = (None, None, l_size), mode = "multihobabs"))
+            hop.add(Dropout(0.1))
             hop.add(AttentionRecurrent(self.sent_hidden_size))
+            hop.add(Dropout(0.1))
             past.append(hop)
 
 

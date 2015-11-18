@@ -89,8 +89,8 @@ if __name__=="__main__":
     columns = np.vstack([columns,mean])
     #if(column[0])
 
-    #print tabulate(columns,headers="firstrow", tablefmt= "latex_booktabs")
-    print tabulate(columns,headers="firstrow", tablefmt= "html")
+    print tabulate(columns,headers="firstrow", tablefmt= "latex_booktabs")
+    #print tabulate(columns,headers="firstrow", tablefmt= "html")
 
 
 
