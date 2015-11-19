@@ -13,7 +13,7 @@ from utils import bcolors
 from keras.callbacks import EarlyStopping, LearningRateScheduler
 import os.path
 
-BATCH_SIZE = 1000
+BATCH_SIZE = 1500
 EPOCHS = 5000
 HOPS = 3
 ONLY_SUPPORTING = False

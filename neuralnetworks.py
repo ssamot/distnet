@@ -16,7 +16,7 @@ from keras.layers.convolutional import Convolution1D, MaxPooling1D
 
 from utils import bcolors
 
-size = 2**6+30
+size = 2**6
 attention = size
 
 
@@ -81,7 +81,7 @@ class Logic():
             hop.add(AttentionMerge(init_qa + past, l_size, input_shape = (None, None, l_size), mode = "multihobabs"))
             hop.add(Dropout(0.1))
             hop.add(AttentionRecurrent(self.sent_hidden_size))
-            hop.add(Dropout(0.1))
+            #hop.add(Dropout(0.1))
             past.append(hop)
 
 
