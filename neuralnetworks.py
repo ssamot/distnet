@@ -16,7 +16,7 @@ from keras.layers.convolutional import Convolution1D, MaxPooling1D
 
 from utils import bcolors
 
-size = 2**6
+size = 2**7
 attention = size
 
 
