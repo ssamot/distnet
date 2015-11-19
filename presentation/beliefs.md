@@ -301,10 +301,42 @@ Where was the football before the bathroom?  office
     * Use a recurrent softmax mechanism to get the most relevant sentences
 
 
+## Word embeddings
+* Each word in a sentence is given a numerical representation (i.e., "Bob" is given the number one)
+* Each numerical representation is linked to a position within a matrix/vector, which points to weights
+* Weights (after training) will provide us with a vectorial representation of words
+* You tend to get nice properties like: $King - Queen = Man - Woman$
+
+## MaxPooling
+* Get only the most important features from the words of each sentence
+* Pool on sentence level
+    * For every sentence, find the each feature maximum (per word) and propagate only this
+
+## RNN encoder
+* For the question sentence: 
+  * Get the final vector representation as provided by an RNN
+
+## Attention
+* Subtract each sentence vector from each question vector
+* Find the absolute, i.e a distance measurement
+* Let's call this absolute $X$
+* Some code which I have to convert to math at some point: 
+  * Weight matrix size $[X.shape[0], 2]$
+  * for each timestep:
+        \begin{align}
+          att = softmax(X \cdot W + b) \\
+          z_0 = att_0 \\
+          z_1 = att_1 \\
+          h_t = z_0  x_{t-1} + z_1 x_{t}
+        \end{align}
+
+        
+
+
 ## Intuition
 * Goal is to find the most relevant sentence 
 * Focus on it - get results
-* Same mechanism that would work for finding $Q(\mathcal{T}(b(s), a)$
+* Same mechanism that would work for finding $Q(\mathcal{T}(b(s)), a)$
 * But this is just a mechanism I came up with
 * Many more (see JC today)
 
