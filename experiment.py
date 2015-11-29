@@ -13,7 +13,7 @@ from utils import bcolors
 from keras.callbacks import EarlyStopping, LearningRateScheduler
 import os.path
 
-BATCH_SIZE = 750
+BATCH_SIZE = 300
 EPOCHS = 5000
 HOPS = 3
 ONLY_SUPPORTING = False
@@ -184,7 +184,7 @@ if(opts.memory):
 
     #
     print("Compiling...")
-    attention = nn.distancenet(vocab_size, vocab_size, dropout = True, d_perc = 0.1, hop_depth = HOPS, type = "CCE", maxsize = max_sentence_length)
+    attention = nn.distancenet(vocab_size, vocab_size, dropout = True, d_perc = 0.5, hop_depth = HOPS, type = "CCE", maxsize = max_sentence_length)
     #attention = nn.sequencialattention(vocab_size, vocab_size, dropout = True, d_perc = 0.2, hop_depth = 2, type = "CCE", maxsize = max_sentence_length)
     #attention = nn.softmaxattention(vocab_size, vocab_size, dropout = True, d_perc = 0.2, hop_depth = 1, type = "CCE", maxsize = max_sentence_length)
 

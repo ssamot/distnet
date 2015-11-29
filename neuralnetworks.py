@@ -8,7 +8,7 @@ from keras.models import Sequential
 from layers import InputDropout, AttentionMerge, AttentionRecurrent
 from keras.layers.normalization import BatchNormalization
 from keras.layers.recurrent import SimpleRNN, GRU, LSTM
-from keras.layers.advanced_activations import LeakyReLU, PReLU
+from keras.layers.advanced_activations import LeakyReLU, PReLU, ELU
 from keras.constraints import MaxNorm
 from keras.layers.noise import GaussianNoise
 from keras.regularizers import WeightRegularizer
@@ -30,7 +30,7 @@ def mx():
 
 def bn():
     #return BatchNormalization(mode = 0)
-    return BatchNormalization(mode = 1, momentum=0.1)
+    return BatchNormalization(mode = 1, momentum=0.9)
 
 
 
@@ -63,13 +63,16 @@ class Logic():
 
         sentrnn = Sequential()
 
-        sentrnn.add(Embedding(vocab_size, self.embed_hidden_size, mask_zero=False,W_constraint=mx(), W_regularizer=reg()))
+        sentrnn.add(Embedding(vocab_size, self.embed_hidden_size, mask_zero=False,W_constraint=mx(), W_regularizer=reg(), init = "glorot_normal"))
         sentrnn.add(MaxPooling1D(pool_length=maxsize))
+        #sentrnn.add(AttentionRecurrent(self.query_hidden_size, return_sequences=True))
         #sentrnn.add(Dropout(0.1))
 
+
         qrnn = Sequential()
-        qrnn.add(Embedding(vocab_size, self.embed_hidden_size, mask_zero=True,W_constraint=mx(), W_regularizer=reg()))
-        qrnn.add(SimpleRNN( self.query_hidden_size, return_sequences=False,activation = "relu"))
+        qrnn.add(Embedding(vocab_size, self.embed_hidden_size, mask_zero=True,W_constraint=mx(), W_regularizer=reg(), init = "glorot_normal"))
+        qrnn.add(SimpleRNN( self.query_hidden_size, return_sequences=False,activation = "relu", init = "glorot_normal"))
+        #qrnn.add(AttentionRecurrent(self.query_hidden_size))
 
 
 
@@ -79,9 +82,9 @@ class Logic():
             hop = Sequential()
             l_size = self.sent_hidden_size
             hop.add(AttentionMerge(init_qa + past, l_size, input_shape = (None, None, l_size), mode = "multihobabs"))
-            hop.add(Dropout(0.1))
-            hop.add(AttentionRecurrent(self.sent_hidden_size))
-            #hop.add(Dropout(0.1))
+            hop.add(Dropout(0.05))
+            hop.add(AttentionRecurrent(self.sent_hidden_size, init = "glorot_normal"))
+            #hop.add(Dropout(0.05))
             past.append(hop)
 
 
@@ -156,15 +159,28 @@ class Logic():
 
 
     def _adddepth(self, model, vocab_size, dropout, d_perc, softmax):
-        model.add(Dense( self.deep_hidden_size,W_constraint=mx(),  W_regularizer=reg()))
+        model.add(Dense( self.deep_hidden_size,W_constraint=mx(),  W_regularizer=reg(), init = "glorot_normal"))
         model.add(LeakyReLU())
 
         if(dropout):
             model.add(bn())
             model.add(Dropout(d_perc))
 
-
-
+        # model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = "glorot_normal" ))
+        # model.add(LeakyReLU())
+        #
+        # if(dropout):
+        #     model.add(bn())
+        #     model.add(Dropout(d_perc))
+        #
+        # model.add(Dense(self.deep_hidden_size,W_constraint=mx().init = "glorot_normal" ))
+        # model.add(LeakyReLU())
+        #
+        # if(dropout):
+        #     model.add(bn())
+        #     model.add(Dropout(d_perc))
+        #
+        #
         # model.add(Dense(self.deep_hidden_size,W_constraint=mx() ))
         # model.add(LeakyReLU())
         #
@@ -173,8 +189,6 @@ class Logic():
         #     model.add(Dropout(d_perc))
         #
         #
-        #
-        #
         # model.add(Dense(self.deep_hidden_size,W_constraint=mx() ))
         # model.add(LeakyReLU())
         #
@@ -185,7 +199,9 @@ class Logic():
 
 
 
-        model.add(Dense( vocab_size,W_constraint=mx(), W_regularizer=reg()))
+
+
+        model.add(Dense( vocab_size,W_constraint=mx(), W_regularizer=reg(), init = "glorot_normal"))
         if(softmax):
             model.add(Activation('softmax'))
 
