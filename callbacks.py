@@ -15,7 +15,7 @@ class LRScheduler():
         self.lr = 0.01
     def schedule(self, epoch):
         self.lr = self.lr*0.99
-        self.lr = max(self.lr, 0.001)
+        self.lr = max(self.lr, 0.005)
         print("LR: ",epoch,self.lr, file=sys.stderr)
         return self.lr
 

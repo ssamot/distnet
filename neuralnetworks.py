@@ -84,7 +84,7 @@ class Logic():
             hop.add(AttentionMerge(init_qa + past, l_size, input_shape = (None, None, l_size), mode = "multihobabs"))
             hop.add(Dropout(0.05))
             hop.add(AttentionRecurrent(self.sent_hidden_size, init = "glorot_normal"))
-            #hop.add(Dropout(0.05))
+            hop.add(Dropout(0.05))
             past.append(hop)
 
 
@@ -160,18 +160,18 @@ class Logic():
 
     def _adddepth(self, model, vocab_size, dropout, d_perc, softmax):
         model.add(Dense( self.deep_hidden_size,W_constraint=mx(),  W_regularizer=reg(), init = "glorot_normal"))
-        model.add(LeakyReLU())
+        model.add(ELU())
 
         if(dropout):
             model.add(bn())
             model.add(Dropout(d_perc))
 
-        # model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = "glorot_normal" ))
-        # model.add(LeakyReLU())
-        #
-        # if(dropout):
-        #     model.add(bn())
-        #     model.add(Dropout(d_perc))
+        model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = "glorot_normal" ))
+        model.add(ELU())
+
+        if(dropout):
+            model.add(bn())
+            model.add(Dropout(d_perc))
         #
         # model.add(Dense(self.deep_hidden_size,W_constraint=mx().init = "glorot_normal" ))
         # model.add(LeakyReLU())
