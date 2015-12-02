@@ -1,7 +1,7 @@
 s__author__ = 'ssamot'
 
 from keras.layers.embeddings import Embedding
-from keras.layers.core import Activation, Dropout, TimeDistributedDense, Dense, Merge
+from keras.layers.core import Activation, Dropout, TimeDistributedDense, Dense, Merge, MaxoutDense
 from keras.models import Sequential
 
 
@@ -48,11 +48,12 @@ class Logic():
 
 
     def _getopt(self):
-        from keras.optimizers import adam, rmsprop, sgd
+        from keras.optimizers import adam, rmsprop, sgd, adadelta
         learning_rate = (1e-2)/2
-        opt = adam(lr=learning_rate, epsilon = 0.001)
+        opt = adam(lr=learning_rate, beta_1= 0.1, beta_2= 0.001, epsilon = 0.001)
         #opt = rmsprop(learning_rate)
-        #opt = sgd(learning_rate = 0.01, momentum= 0.8)
+        #opt = adadelta()
+        #opt = sgd(learning_rate = 0.01, momentum= 0.8, nesterov=True)
         return opt
 
 
