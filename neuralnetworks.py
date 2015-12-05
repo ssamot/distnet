@@ -1,7 +1,7 @@
 s__author__ = 'ssamot'
 
 from keras.layers.embeddings import Embedding
-from keras.layers.core import Activation, Dropout, TimeDistributedDense, Dense, Merge, MaxoutDense
+from keras.layers.core import Activation, Dropout, TimeDistributedDense, Dense, Merge
 from keras.models import Sequential
 
 
@@ -13,12 +13,20 @@ from keras.constraints import MaxNorm
 from keras.layers.noise import GaussianNoise
 from keras.regularizers import WeightRegularizer
 from keras.layers.convolutional import Convolution1D, MaxPooling1D
-
+from keras import activations
+import theano.tensor as T
 from utils import bcolors
 
-size = 2**7
+size = 2**7-28
 attention = size
+alpha = 1.0
 
+
+
+def elu(X):
+    return ((X + abs(X)) / 2.0) + alpha * (T.exp((X - abs(X)) / 2.0) - 1)
+
+activations.elu = elu
 
 def reg():
     return None
@@ -50,7 +58,7 @@ class Logic():
     def _getopt(self):
         from keras.optimizers import adam, rmsprop, sgd, adadelta
         learning_rate = (1e-2)/2
-        opt = adam(lr=learning_rate, beta_1= 0.1, beta_2= 0.001, epsilon = 0.001)
+        opt = adam(lr=learning_rate, epsilon = 0.001)
         #opt = rmsprop(learning_rate)
         #opt = adadelta()
         #opt = sgd(learning_rate = 0.01, momentum= 0.8, nesterov=True)
@@ -66,13 +74,15 @@ class Logic():
 
         sentrnn.add(Embedding(vocab_size, self.embed_hidden_size, mask_zero=False,W_constraint=mx(), W_regularizer=reg(), init = "glorot_normal"))
         sentrnn.add(MaxPooling1D(pool_length=maxsize))
-        #sentrnn.add(AttentionRecurrent(self.query_hidden_size, return_sequences=True))
+        ##sentrnn.add(AttentionRecurrent(self.query_hidden_size, return_sequences=True))
         #sentrnn.add(Dropout(0.1))
 
 
         qrnn = Sequential()
         qrnn.add(Embedding(vocab_size, self.embed_hidden_size, mask_zero=True,W_constraint=mx(), W_regularizer=reg(), init = "glorot_normal"))
-        qrnn.add(SimpleRNN( self.query_hidden_size, return_sequences=False,activation = "relu", init = "glorot_normal"))
+
+        qrnn.add(SimpleRNN( self.query_hidden_size, return_sequences=False,activation = "elu", init = "glorot_normal"))
+        #qrnn.add(Dense)
         #qrnn.add(AttentionRecurrent(self.query_hidden_size))
 
 
@@ -82,7 +92,10 @@ class Logic():
         for i in range(hop_depth):
             hop = Sequential()
             l_size = self.sent_hidden_size
+
             hop.add(AttentionMerge(init_qa + past, l_size, input_shape = (None, None, l_size), mode = "multihobabs"))
+            hop.add(Dropout(0.05))
+            hop.add(TimeDistributedDense(self.sent_hidden_size, activation = "elu", init = "glorot_normal"))
             hop.add(Dropout(0.05))
             hop.add(AttentionRecurrent(self.sent_hidden_size, init = "glorot_normal"))
             hop.add(Dropout(0.05))
@@ -174,24 +187,16 @@ class Logic():
             model.add(bn())
             model.add(Dropout(d_perc))
         #
-        # model.add(Dense(self.deep_hidden_size,W_constraint=mx().init = "glorot_normal" ))
-        # model.add(LeakyReLU())
+        #
+        # model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = "glorot_normal" ))
+        # model.add(ELU())
         #
         # if(dropout):
         #     model.add(bn())
         #     model.add(Dropout(d_perc))
         #
-        #
-        # model.add(Dense(self.deep_hidden_size,W_constraint=mx() ))
-        # model.add(LeakyReLU())
-        #
-        # if(dropout):
-        #     model.add(bn())
-        #     model.add(Dropout(d_perc))
-        #
-        #
-        # model.add(Dense(self.deep_hidden_size,W_constraint=mx() ))
-        # model.add(LeakyReLU())
+        #  model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = "glorot_normal" ))
+        # model.add(ELU())
         #
         # if(dropout):
         #     model.add(bn())

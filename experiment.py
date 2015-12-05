@@ -13,7 +13,7 @@ from utils import bcolors
 from keras.callbacks import EarlyStopping, LearningRateScheduler
 import os.path
 
-BATCH_SIZE = 300
+BATCH_SIZE = 600
 EPOCHS = 5000
 HOPS = 3
 ONLY_SUPPORTING = False
@@ -80,8 +80,8 @@ train = []
 test = []
 
 for i, task in enumerate(tasks_full_path):
-    if(i> 1):
-        break
+    # if(i> 1):
+    #     break
 
     print(bcolors.HEADER + "Loading task " + task + " ..." + bcolors.ENDC)
     train_data = tar.extractfile(task.format('train')).readlines()
@@ -184,7 +184,7 @@ if(opts.memory):
 
     #
     print("Compiling...")
-    attention = nn.distancenet(vocab_size, vocab_size, dropout = True, d_perc = 0.2, hop_depth = HOPS, type = "CCE", maxsize = max_sentence_length)
+    attention = nn.distancenet(vocab_size, vocab_size, dropout = True, d_perc = 0.3, hop_depth = HOPS, type = "CCE", maxsize = max_sentence_length)
     #attention = nn.sequencialattention(vocab_size, vocab_size, dropout = True, d_perc = 0.2, hop_depth = 2, type = "CCE", maxsize = max_sentence_length)
     #attention = nn.softmaxattention(vocab_size, vocab_size, dropout = True, d_perc = 0.2, hop_depth = 1, type = "CCE", maxsize = max_sentence_length)
 

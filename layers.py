@@ -69,6 +69,8 @@ class AttentionMerge(MaskedLayer):
                     self.params.append(p)
                     self.constraints.append(c)
 
+        self.activation = activations.relu
+
         self.mask = None
 
     def get_output_mask(self, train=None):
@@ -119,6 +121,8 @@ class AttentionMerge(MaskedLayer):
                 question = self.layers[i].get_output(train).dimshuffle(0, "x", 1)
                 repeated = T.repeat(question, splits.shape[0], axis=1).dimshuffle(1, 0, 2)
                 tbr += repeated
+            tbr = self.activation(tbr)
+            tbr = tbr.dimshuffle(1, 0, 2)
 
         if (self.mode == "multihobabs"):
             tbr = splits
@@ -127,9 +131,9 @@ class AttentionMerge(MaskedLayer):
                 repeated = T.repeat(question, splits.shape[0], axis=1).dimshuffle(1, 0, 2)
                 tbr -= repeated
 
-            tbr = abs(tbr)
+            tbr = abs(tbr)*tbr
 
-        tbr = tbr.dimshuffle(1, 0, 2)
+            tbr = tbr.dimshuffle(1, 0, 2)
         return tbr
 
     def get_input(self, train=False):
