@@ -17,7 +17,7 @@ from keras import activations
 import theano.tensor as T
 from utils import bcolors
 
-size = 2**7-28
+size = 2**7
 attention = size
 alpha = 1.0
 
@@ -94,11 +94,11 @@ class Logic():
             l_size = self.sent_hidden_size
 
             hop.add(AttentionMerge(init_qa + past, l_size, input_shape = (None, None, l_size), mode = "multihobabs"))
-            hop.add(Dropout(0.05))
+            hop.add(Dropout(0.07))
             hop.add(TimeDistributedDense(self.sent_hidden_size, activation = "elu", init = "glorot_normal"))
-            hop.add(Dropout(0.05))
+            hop.add(Dropout(0.07))
             hop.add(AttentionRecurrent(self.sent_hidden_size, init = "glorot_normal"))
-            hop.add(Dropout(0.05))
+            hop.add(Dropout(0.07))
             past.append(hop)
 
 
