@@ -82,6 +82,8 @@ test = []
 for i, task in enumerate(tasks_full_path):
     # if(i> 1):
     #     break
+    if(i!=15):
+        continue
 
     print(bcolors.HEADER + "Loading task " + task + " ..." + bcolors.ENDC)
     train_data = tar.extractfile(task.format('train')).readlines()
@@ -194,8 +196,10 @@ else:
 
 try:
     sch = LRScheduler().schedule
-    history = attention.fit([X, Xq], Y, batch_size=BATCH_SIZE, nb_epoch=EPOCHS, show_accuracy=True,
-                        callbacks=[LearningRateScheduler(sch)] )
+    # X = X.astype(np.float32)
+    # Xq = Xq.astype(np.float32)
+    # Y = Y.astype(np.float32)
+    history = attention.fit([X, Xq], Y, batch_size=BATCH_SIZE, nb_epoch=EPOCHS, show_accuracy=True)
 except KeyboardInterrupt:
     print("Stoppping")
 
