@@ -15,5 +15,5 @@ fi
 ##python experiment.py --onlysup --10K
 #python experiment.py 
 ##python experiment.py --10K
-#python experiment.py --memory 
-python experiment.py --memory --10K
+python experiment.py --memory 
+#python experiment.py --memory --10K

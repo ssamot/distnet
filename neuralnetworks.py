@@ -17,7 +17,7 @@ from keras import activations
 import theano.tensor as T
 from utils import bcolors
 
-size = 2**6
+size = 2**7
 attention = size
 alpha = 1.0
 
@@ -27,7 +27,11 @@ init_function = "glorot_normal"
 def elu(X):
     return ((X + abs(X)) / 2.0) + alpha * (T.exp((X - abs(X)) / 2.0) - 1)
 
+def leakyrelu(X):
+    return T.nnet.relu(X, 0.3)
+
 activations.elu = elu
+activations.leakyrelu = leakyrelu
 
 def reg():
     return None
@@ -90,7 +94,7 @@ class Logic():
         emb = Embedding(vocab_size, self.embed_hidden_size, mask_zero=False,W_constraint=mx(), W_regularizer=reg(), init = init_function)
         qrnn.add(emb)
 
-        qrnn.add(SimpleRNN( self.query_hidden_size, return_sequences=False,activation = "elu", init = init_function))
+        qrnn.add(SimpleRNN( self.query_hidden_size, return_sequences=False,activation = "leakyrelu", init = init_function))
         #qrnn.add(BatchNormalization(mode = 1, momentum=0.9))
         #qrnn.add(Dense)
         #qrnn.add(AttentionRecurrent(self.query_hidden_size))
@@ -103,11 +107,11 @@ class Logic():
             hop = Sequential()
             l_size = self.sent_hidden_size
             hop.add(AttentionMerge(init_qa + past, input_shape = (None, None, l_size), mode = "distance"))
-            hop.add(Dropout(0.05))
-            hop.add(TimeDistributedDense(self.sent_hidden_size, activation = "elu", init = init_function))
-            hop.add(Dropout(0.05))
+            hop.add(Dropout(0.1))
+            hop.add(TimeDistributedDense(self.sent_hidden_size, activation = "leakyrelu", init = init_function))
+            hop.add(Dropout(0.1))
             hop.add(AttentionRecurrent(self.sent_hidden_size, init = init_function))
-            hop.add(Dropout(0.05))
+            hop.add(Dropout(0.1))
             past.append(hop)
 
 
@@ -183,36 +187,24 @@ class Logic():
 
 
     def _adddepth(self, model, vocab_size, dropout, d_perc, softmax):
-        model.add(Dense( self.deep_hidden_size,W_constraint=mx(),  W_regularizer=reg(), init = init_function))
-        model.add(ELU())
+        model.add(Dense( self.deep_hidden_size,W_constraint=mx(),  W_regularizer=reg(), init = init_function, activation = "leakyrelu"))
 
         if(dropout):
             model.add(bn())
             model.add(Dropout(d_perc))
 
-        model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = init_function ))
-        model.add(ELU())
+        model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = init_function,activation = "leakyrelu" ))
 
         if(dropout):
             model.add(bn())
             model.add(Dropout(d_perc))
-        # #
-        # # #
-        # model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = init_function ))
-        # model.add(ELU())
-        #
-        # if(dropout):
-        #     model.add(bn())
-        #     model.add(Dropout(d_perc))
-
-        #model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = init_function ))
-        #model.add(ELU())
-        #
-        # if(dropout):
-        #     model.add(bn())
-        #     model.add(Dropout(d_perc))
 
 
+        model.add(Dense(self.deep_hidden_size,W_constraint=mx(), init = init_function,activation = "leakyrelu" ))
+
+        if(dropout):
+            model.add(bn())
+            model.add(Dropout(d_perc))
 
 
 
