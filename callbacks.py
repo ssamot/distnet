@@ -12,7 +12,7 @@ from keras.callbacks import Callback
 class LRScheduler():
 
     def __init__(self):
-        self.lr = 0.01
+        self.lr = 0.001
     def schedule(self, epoch):
         self.lr = self.lr*0.99
         self.lr = max(self.lr, 0.001)
