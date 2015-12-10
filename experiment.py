@@ -80,8 +80,8 @@ train = []
 test = []
 
 for i, task in enumerate(tasks_full_path):
-    # if(i> 1):
-    #     break
+    if(i> 1):
+        break
 
     print(bcolors.HEADER + "Loading task " + task + " ..." + bcolors.ENDC)
     train_data = tar.extractfile(task.format('train')).readlines()
