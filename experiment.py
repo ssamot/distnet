@@ -15,7 +15,7 @@ import os.path
 
 BATCH_SIZE = 300
 EPOCHS = 1000
-HOPS = 3
+HOPS = 2
 ONLY_SUPPORTING = False
 
 np.set_printoptions(precision=4)
@@ -80,8 +80,8 @@ train = []
 test = []
 
 for i, task in enumerate(tasks_full_path):
-    if(i> 1):
-        break
+    # if(i> 1):
+    #     break
     # if(i!=15):
     # #     continue
 
