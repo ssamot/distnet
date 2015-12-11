@@ -1,6 +1,6 @@
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 from theano.tensor.shared_randomstreams import RandomStreams as RS
-from keras.layers.core import MaskedLayer, initializations, activations
+from keras.layers.core import MaskedLayer, initializations, activations, Layer
 import numpy as np
 
 from keras.layers.recurrent import GRU, Recurrent
@@ -9,6 +9,35 @@ import theano.tensor as T
 import theano
 from theano.tensor.basic import cast
 
+class DownSample1D(MaskedLayer):
+    input_ndim = 3
+
+    def __init__(self, length=2, **kwargs):
+        super(DownSample1D, self).__init__(**kwargs)
+        self.length = length
+        self.input = T.tensor3()
+
+    @property
+    def output_shape(self):
+        input_shape = self.input_shape
+        return (input_shape[0], self.length * input_shape[1], input_shape[2])
+
+    def get_output(self, train=False):
+        X = self.get_input(train)
+        splits = X.dimshuffle(1, 0, 2)
+        idx = theano.tensor.arange(splits.shape[0]-1,-1,-self.length)[::-1]
+        splits = splits[idx]
+        splits = splits.dimshuffle(1, 0, 2)
+        return splits
+
+    def get_output_mask(self, train=None):
+        return None
+
+    def get_config(self):
+        config = {"name": self.__class__.__name__,
+                  "length": self.length}
+        base_config = super(DownSample1D, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
 class InputDropout(MaskedLayer):
     '''
@@ -37,7 +66,7 @@ class InputDropout(MaskedLayer):
 class AttentionMerge(MaskedLayer):
     input_ndim = 3
 
-    def __init__(self, layers, output_dim, input_shape, mode='mul', final=False, concat_axis=-1, len_max_sentence=10):
+    def __init__(self, layers, input_shape, mode='mul', final=False, concat_axis=-1, len_max_sentence=10):
         ''' Merge the output of a list of layers or containers into a single tensor.
             mode: {'sum', 'mul', 'concat'}
         '''
@@ -51,7 +80,6 @@ class AttentionMerge(MaskedLayer):
         self.constraints = []
         self.updates = []
         self.split_points = len_max_sentence
-        self.output_dim = output_dim
         self.input_ndim = AttentionMerge.input_ndim
         self._input_shape = input_shape
         self.softmax = activations.get("softmax")
@@ -115,16 +143,16 @@ class AttentionMerge(MaskedLayer):
 
 
 
-        if (self.mode == "multihopadd"):
-            tbr = splits
+        if (self.mode == "concat"):
+            tbr = [splits]
             for i in range(1, len(self.layers)):
                 question = self.layers[i].get_output(train).dimshuffle(0, "x", 1)
                 repeated = T.repeat(question, splits.shape[0], axis=1).dimshuffle(1, 0, 2)
-                tbr += repeated
-            tbr = self.activation(tbr)
+                tbr += [repeated]
+            tbr = T.concatenate(tbr)
             tbr = tbr.dimshuffle(1, 0, 2)
 
-        if (self.mode == "multihobabs"):
+        if (self.mode == "distance"):
             tbr = splits
             for i in range(1, len(self.layers)):
                 question = self.layers[i].get_output(train).dimshuffle(0, "x", 1)

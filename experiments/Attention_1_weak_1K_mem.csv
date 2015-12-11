@@ -1,0 +1,23 @@
+Attention_1_weak_1K_mem
+RNN / Embed / Sent / Query / Hidden = <class 'keras.layers.recurrent.SimpleRNN'>, 128, 128, 128, 128
+Weak Supervision 1K Memory
+1.00000 
+0.36200 
+0.34600 
+0.89100 
+0.84700 
+0.99900 
+0.88100 
+0.95000 
+1.00000 
+0.99700 
+0.92600 
+1.00000 
+0.94600 
+0.78400 
+0.83900 
+0.46700 
+0.56000 
+0.91400 
+0.13300 
+1.00000 
